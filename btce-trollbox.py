@@ -8,6 +8,7 @@ btc-e.com chat channal
 """
 
 from   __future__ import print_function
+from   sys        import argv
 import websocket
 from   json       import loads as jsload
 
@@ -26,6 +27,7 @@ COLOR_10  = "\033[1;30m"  # ярко-синий
 COLORS   = (COLOR_2, COLOR_3, COLOR_4, COLOR_5,
             COLOR_6, COLOR_7, COLOR_8, COLOR_9)
 
+CHANNEL  = "chat_ru"
 CHAT_URL = "wss://ws.pusherapp.com/app/4e0ebd7a8b66fa3554a4?protocol=6&client=js&version=2.0.0&flash=false"
 
 def get_chat_connection():
@@ -34,7 +36,7 @@ def get_chat_connection():
     return ws
 
 def chat_handshake(ws):
-    hello_msg = """{"event":"pusher:subscribe","data":{"channel":"chat_ru"}}"""
+    hello_msg = """{"event":"pusher:subscribe","data":{"channel":"%s"}}"""% CHANNEL
     server_hello = ws.recv()
     ws.send(hello_msg)
 
@@ -50,23 +52,29 @@ def deserialize(json):
     return tmp
 
 def main():
+    global CHANNEL
+
+    if len(argv) > 1:
+        CHANNEL = argv[1]
+
     print("BTC-E TrollBOX")
     print("Connecting...", end = " ")
 
     ws = get_chat_connection()
     chat_handshake(ws)
-    print("OK\n\n")
+    print("OK\nchannel: {0}\n".format(CHANNEL))
 
     while True:
         chat_message = ws.recv()
         struct = deserialize(chat_message)
+        login  = struct.get("login", "")
 
-        login = struct.get("login", "")
+        if not login: continue
 
         format_params = {
             "login"     : login,
             "date"      : struct.get("date",  ""),
-            "msg"       : struct.get("msg",   "").encode("utf-8"),
+            "msg"       : struct.get("msg",   "").encode("utf-8", errors="replace"),
             "login_clr" : COLORS[hash(login) % len(COLORS)],
             "colon_clr" : COLOR_10,
             "nocollor"  : COLOR_0
