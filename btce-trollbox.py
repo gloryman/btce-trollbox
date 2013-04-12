@@ -23,9 +23,8 @@ COLOR_8   = "\033[1;31m"  # ярко-красный
 COLOR_9   = "\033[1;34m"  # серый
 COLOR_10  = "\033[1;30m"  # ярко-синий
 
-COLORS   = (COLOR_2, COLOR_3,
-            COLOR_4, COLOR_5, COLOR_6, COLOR_7,
-            COLOR_8, COLOR_9)
+COLORS   = (COLOR_2, COLOR_3, COLOR_4, COLOR_5,
+            COLOR_6, COLOR_7, COLOR_8, COLOR_9)
 
 CHAT_URL = "wss://ws.pusherapp.com/app/4e0ebd7a8b66fa3554a4?protocol=6&client=js&version=2.0.0&flash=false"
 
