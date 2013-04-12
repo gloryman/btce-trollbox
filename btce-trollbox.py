@@ -12,6 +12,8 @@ from   sys        import argv
 import websocket
 from   json       import loads as jsload
 
+__author__ = "slavamnemonic@gmail.com"
+
 COLOR_0   = "\033[m"      # серый
 COLOR_1   = "\033[1m"     # жирный (bold)
 COLOR_2   = "\033[0;32m"  # зелёный
