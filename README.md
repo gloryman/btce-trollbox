@@ -1,13 +1,14 @@
 btc-e.com TollBOX console viewer
 
-For those of you who would like see more chat messages on screen.
-Unfortunately script require external library: websocket-client
+Now you should be able to see chat in appropriate window size.
+Script requires an external library: websocket-client
 
-By default script connect to russian channel. One of following channel could be set as parameter:
+By default script connect to the Russian channel.
+You can switch the language by providing a parameter:
 
-Possible channel value: chat_en, chat_ru, chat_cn
+	chat_en | chat_ru | chat_cn
 
-Exceute example:
+For example:
 
 	btce-trollbox.py chat_en
 
