@@ -44,7 +44,11 @@ def chat_handshake(ws):
 
 def deserialize(json):
     obj_lvl1 = jsload(json)
-    return jsload(jsload(obj_lvl1.get("data", "{}")))
+    tmp = jsload(jsload(obj_lvl1.get("data", "{}")))
+    if not isinstance(tmp, dict):
+        tmp = {}
+
+    return tmp
 
 def main():
     print("BTC-E TrollBOX")
