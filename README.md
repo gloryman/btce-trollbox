@@ -12,3 +12,7 @@ For example:
 
 	btce-trollbox.py chat_en
 
+INSTALL:
+	
+	pip install --user websocket-client
+	wget -c https://raw.github.com/gloryman/btce-trollbox/master/btce-trollbox.py
