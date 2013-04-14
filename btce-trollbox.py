@@ -31,10 +31,12 @@ COLORS   = (COLOR_2, COLOR_3, COLOR_4, COLOR_5,
 
 CHANNEL  = "chat_ru"
 CHAT_URL = "wss://ws.pusherapp.com/app/4e0ebd7a8b66fa3554a4?protocol=6&client=js&version=2.0.0&flash=false"
+CONNECTION_TIMEOUT = 30
 
 def get_chat_connection():
     ws = websocket.WebSocket()
     ws.connect(CHAT_URL)
+    ws.settimeout(CONNECTION_TIMEOUT)
     return ws
 
 def chat_handshake(ws):
@@ -67,9 +69,19 @@ def main():
     print("OK\nchannel: {0}\n".format(CHANNEL))
 
     while True:
-        chat_message = ws.recv()
+        try:
+            chat_message = ws.recv()
+        except websocket.socket.sslerror, e:
+            print("[!] Connection timeout reconect")
+            print("Reconnect...", end = " ")
+            ws = get_chat_connection()
+            chat_handshake(ws)
+            print("OK\nchannel: {0}\n".format(CHANNEL))
+            continue
+
+
         struct = deserialize(chat_message)
-        login  = struct.get("login", "")
+        login  = struct.get("login")
 
         if not login: continue
 
