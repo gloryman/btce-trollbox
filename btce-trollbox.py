@@ -72,7 +72,7 @@ def main():
         try:
             chat_message = ws.recv()
         except websocket.socket.sslerror, e:
-            print("[!] Connection timeout reconect")
+            print("\n\nConnection timeout reconect")
             print("Reconnect...", end = " ")
             ws = get_chat_connection()
             chat_handshake(ws)
