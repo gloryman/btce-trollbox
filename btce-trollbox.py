@@ -77,6 +77,7 @@ def message_preprocess(msg, logins=set()):
 
 def main():
     global CHANNEL
+    logins = set()
 
     if len(argv) > 1:
         CHANNEL = argv[1]
@@ -102,13 +103,15 @@ def main():
 
         struct = deserialize(chat_message)
         login  = struct.get("login")
+        msg    = struct.get("msg",   "").encode("utf-8", errors="replace")
 
         if not login: continue
+        logins.add(login)
 
         format_params = {
             "login"     : login,
             "date"      : struct.get("date",  ""),
-            "msg"       : struct.get("msg",   "").encode("utf-8", errors="replace"),
+            "msg"       : message_preprocess(msg, logins),
             "login_clr" : COLORS[hash(login) % len(COLORS)],
             "colon_clr" : COLOR_10,
             "nocollor"  : COLOR_0
