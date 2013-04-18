@@ -55,6 +55,26 @@ def deserialize(json):
 
     return tmp
 
+def message_preprocess(msg, logins=set()):
+    """Colorize user name at message
+
+    msg    - message string
+    logins - set of usernames
+
+    Answer message username set at start of string with coma
+    Color user name if we have this name at logins set of users
+    """
+
+    parts = msg.split(",", 1)
+    if len(parts) == 1: return msg
+
+    head, tail = parts[0], parts[1]
+    if not head in logins: return msg
+
+    user_color = COLORS[hash(head) % len(COLORS)]
+    return "{}{}{},{}".format(user_color, head, COLOR_0, tail)
+
+
 def main():
     global CHANNEL
 
@@ -72,7 +92,7 @@ def main():
         try:
             chat_message = ws.recv()
         except websocket.socket.sslerror, e:
-            print("\n\nConnection timeout reconect")
+            print("\n\nConnection timeout. Reconect")
             print("Reconnect...", end = " ")
             ws = get_chat_connection()
             chat_handshake(ws)
