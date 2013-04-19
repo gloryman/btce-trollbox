@@ -120,4 +120,13 @@ def main():
         print("{login_clr}{login:13}{colon_clr}: {nocollor} {msg} ".format(**format_params))
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except websocket.socket.gaierror, e:
+        print("Socket connection error")
+    except KeyboardInterrupt, e:
+        pass
+    except Exception, e:
+        print("General error")
+
+    print("\nExit")
