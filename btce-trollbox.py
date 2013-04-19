@@ -56,12 +56,12 @@ def deserialize(json):
     return tmp
 
 def message_preprocess(msg, logins=set()):
-    """Colorize user name at message
+    """Colorize user name in mesAsage
 
     msg    - message string
     logins - set of usernames
 
-    Answer message username set at start of string with coma
+    Answer message username set at start of string with comma
     Color user name if we have this name at logins set of users
     """
 
