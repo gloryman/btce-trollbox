@@ -31,7 +31,8 @@ COLORS   = (COLOR_2, COLOR_3, COLOR_4, COLOR_5,
 
 CHANNEL  = "chat_ru"
 CHAT_URL = "wss://ws.pusherapp.com/app/4e0ebd7a8b66fa3554a4?protocol=6&client=js&version=2.0.0&flash=false"
-CONNECTION_TIMEOUT = 30
+CONNECTION_TIMEOUT = 120
+
 
 def get_chat_connection():
     ws = websocket.WebSocket()
@@ -92,7 +93,7 @@ def main():
     while True:
         try:
             chat_message = ws.recv()
-        except websocket.socket.sslerror, e:
+        except websocket.socket.sslerror:
             print("\n\nConnection timeout. Reconect")
             print("Reconnect...", end = " ")
             ws = get_chat_connection()
@@ -122,11 +123,11 @@ def main():
 if __name__ == "__main__":
     try:
         main()
-    except websocket.socket.gaierror, e:
+    except websocket.socket.gaierror:
         print("Socket connection error")
-    except KeyboardInterrupt, e:
+    except KeyboardInterrupt:
         pass
-    except Exception, e:
+    except Exception:
         print("General error")
 
     print("\nExit")
