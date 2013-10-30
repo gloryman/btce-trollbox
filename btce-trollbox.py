@@ -186,15 +186,45 @@ def chat_loop(chat_stream):##{
         }
 
         print("{login_clr}{login:13}{colon_clr}: {nocollor} {msg} ".format(**format_params))
+##}
+
+def help():##{
+    print("""
+btce-trollbox.py <option>
+
+    --help:         You are here
+    --bte:          BTC-E Troll Box
+    --tradingview:  Tradingview small talk
+""")
+##}
+
+def main():##{
+    stream = None
+    opts, args = getopt(argv[1:], "-h", longopts=("help", "btce", "tradingview"))
+
+    for opt, value in opts:
+        if opt in ("-h", "--help"):
+            help()
+            exit(0)
+
+        if opt == "--btce":
+            stream = btcex(btce_transport())
+            continue
+
+        if opt == "--tradingview":
+            stream = tradingviewx(tradingview_transport())
+            continue
+
+    if not stream:
+        stream = btcex(btce_transport())
+    
+    chat_loop(stream)
+##}
 
 if __name__ == "__main__":
     try:
         main()
-    except websocket.socket.gaierror:
-        print("Socket connection error")
     except KeyboardInterrupt:
         pass
-    except Exception:
-        print("General error")
 
     print("\nExit")
