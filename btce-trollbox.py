@@ -2,7 +2,7 @@
 # vim: fileencoding=utf-8: expandtab: softtabstop=4: shiftwidth=4: foldmethod=marker: fmr=#{,#}
 
 """
-TrollBox v0.1
+TrollBox v0.2
 
 btc-e.com chat channal
 """
