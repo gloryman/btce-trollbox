@@ -96,13 +96,7 @@ def message_preprocess(msg, logins=set()):##{
     parts = [st for st in RE_USERNAMES.split(msg) if st]
     if len(parts) == 1: return msg
 
-    try:
-        head, tail = parts[0], parts[1]
-    except Exception, e:
-        print("-"*80)
-        print("[DEBUG] ", msg)
-        print("-"*80)
-        raise
+    head, tail = parts[0], parts[1]
     if not head in logins: return msg
 
     user_color = COLORS[hash(head) % len(COLORS)]
