@@ -49,21 +49,23 @@ def btce_transport(url=BTCE_CHAT_URL):##{
 ##}
 
 
-def chat_handshake(ws):
+def chat_handshake(ws):##{
     hello_msg = """{"event":"pusher:subscribe","data":{"channel":"%s"}}"""% CHANNEL
-    server_hello = ws.recv()
+    ws.recv()
     ws.send(hello_msg)
-
     subscribe_status = ws.recv()
-    return jsload(subscribe_status)
 
-def deserialize(json):
+    return jsload(subscribe_status)
+##}
+
+def deserialize(json):##{
     obj_lvl1 = jsload(json)
     tmp = jsload(jsload(obj_lvl1.get("data", "{}")))
     if not isinstance(tmp, dict):
         tmp = {}
 
     return tmp
+##}
 
 def message_preprocess(msg, logins=set()):
     """Colorize user name in mesAsage
@@ -84,36 +86,28 @@ def message_preprocess(msg, logins=set()):
     user_color = COLORS[hash(head) % len(COLORS)]
     return "{}{}{},{}".format(user_color, head, COLOR_0, tail)
 
+def btcex(transport):##{
+    """Consume chat messages
 
-def main():
-    global CHANNEL
-    logins = set()
+    ws - BTC-E ready WebSocket
 
-    if len(argv) > 1:
-        CHANNEL = argv[1]
+    returns tuple of user name and chat message
+    """
 
-    print("BTC-E TrollBOX")
-    print("Connecting...", end = " ")
-
-    ws = get_chat_connection()
-    chat_handshake(ws)
-    print("OK\nchannel: {0}\n".format(CHANNEL))
-
+    ws = next(transport)
     while True:
         try:
             chat_message = ws.recv()
         except websocket.socket.sslerror:
-            print("\n\nConnection timeout. Reconect")
-            print("Reconnect...", end = " ")
-            ws = get_chat_connection()
-            chat_handshake(ws)
-            print("OK\nchannel: {0}\n".format(CHANNEL))
+            ws = next(transport)
             continue
-
 
         struct = deserialize(chat_message)
         login  = struct.get("login")
         msg    = struct.get("msg",   "").encode("utf-8", errors="replace")
+
+        yield(login, msg)
+##}
 
         if not login: continue
         logins.add(login)
