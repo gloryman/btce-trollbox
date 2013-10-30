@@ -8,9 +8,14 @@ btc-e.com chat channal
 """
 
 from   __future__ import print_function
-from   sys        import argv
+from   sys        import argv, exit
+from   getopt     import getopt
+import re
+from   time       import sleep
 import websocket
+from   requests   import get as httpget
 from   json       import loads as jsload
+from   bytebuffer import ByteBuffer
 
 __author__ = "slavamnemonic@gmail.com"
 
@@ -31,7 +36,10 @@ COLORS   = (COLOR_2, COLOR_3, COLOR_4, COLOR_5,
 
 CHANNEL  = "chat_ru"
 BTCE_CHAT_URL = "wss://ws.pusherapp.com/app/4e0ebd7a8b66fa3554a4?protocol=6&client=js&version=2.0.0&flash=false"
+TRADINGVIEW_CHAT = "https://www.tradingview.com/message-pipe-es/public"
 CONNECTION_TIMEOUT = 120
+XHR_READ_SIZE = 5
+RE_USERNAMES = re.compile("(^\w*,)|(^@\w*)")
 
 
 def btce_transport(url=BTCE_CHAT_URL):##{
@@ -48,6 +56,14 @@ def btce_transport(url=BTCE_CHAT_URL):##{
         yield ws
 ##}
 
+def tradingview_transport(url=TRADINGVIEW_CHAT):##{
+    while True:
+        try:
+            yield httpget(url, stream=True)
+        except Exception, e:
+            print("[!!!] Esteblish connection error: ", e)
+            sleep(3)
+##}
 
 def chat_handshake(ws):##{
     hello_msg = """{"event":"pusher:subscribe","data":{"channel":"%s"}}"""% CHANNEL
@@ -67,7 +83,7 @@ def deserialize(json):##{
     return tmp
 ##}
 
-def message_preprocess(msg, logins=set()):
+def message_preprocess(msg, logins=set()):##{
     """Colorize user name in mesAsage
 
     msg    - message string
@@ -77,14 +93,21 @@ def message_preprocess(msg, logins=set()):
     Color user name if we have this name at logins set of users
     """
 
-    parts = msg.split(",", 1)
+    parts = [st for st in RE_USERNAMES.split(msg) if st]
     if len(parts) == 1: return msg
 
-    head, tail = parts[0], parts[1]
+    try:
+        head, tail = parts[0], parts[1]
+    except Exception, e:
+        print("-"*80)
+        print("[DEBUG] ", msg)
+        print("-"*80)
+        raise
     if not head in logins: return msg
 
     user_color = COLORS[hash(head) % len(COLORS)]
     return "{}{}{},{}".format(user_color, head, COLOR_0, tail)
+##}
 
 def btcex(transport):##{
     """Consume chat messages
@@ -109,12 +132,53 @@ def btcex(transport):##{
         yield(login, msg)
 ##}
 
+def tradingviewx(transport):##{
+    buffer = ByteBuffer()
+    xhr = next(transport)
+
+    while True:
+        try:
+            data = xhr.raw.read(XHR_READ_SIZE)
+        except Exception, e:
+            print("[!!] Read error: ", e)
+            next(e)
+            continue
+
+        buffer.write(data)
+        line = buffer.read_until(b"\r\n", consume=True)
+
+        if not line: continue
+        if line == ": -1": continue
+        if line.startswith("data: "): line = line[6:]
+
+        try:
+            pkg = jsload(line)
+        except Exception:
+            continue
+
+        channel = pkg.get("text", {}).get("channel")
+        if channel != "chat_bitcoin": continue
+
+        content = pkg.get("text").get("content")
+        meta = content.get("meta")
+        login = content.get('username')
+        msg = content.get("text", "").encode("utf-8", errors="replace")
+        url = meta.get("url", "").encode("utf-8", errors="replace")
+        if url:
+            msg = "{}\n{:<19}{}{}{}".format(msg, "", COLOR_10, url, COLOR_0)
+        if not msg: continue
+
+        yield(login, msg)
+##}
+
+def chat_loop(chat_stream):##{
+    logins = set()
+    for login, msg in chat_stream:
         if not login: continue
         logins.add(login)
 
         format_params = {
             "login"     : login,
-            "date"      : struct.get("date",  ""),
             "msg"       : message_preprocess(msg, logins),
             "login_clr" : COLORS[hash(login) % len(COLORS)],
             "colon_clr" : COLOR_10,
