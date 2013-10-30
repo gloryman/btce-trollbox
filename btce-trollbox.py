@@ -58,8 +58,11 @@ def btce_transport(url=BTCE_CHAT_URL):##{
 
 def tradingview_transport(url=TRADINGVIEW_CHAT):##{
     while True:
+        print("\nConnecting to tradingview...")
         try:
-            yield httpget(url, stream=True)
+            tmp = httpget(url, stream=True, timeout=CONNECTION_TIMEOUT)
+            print("Connected")
+            yield tmp
         except Exception, e:
             print("[!!!] Esteblish connection error: ", e)
             sleep(3)
@@ -133,9 +136,8 @@ def tradingviewx(transport):##{
     while True:
         try:
             data = xhr.raw.read(XHR_READ_SIZE)
-        except Exception, e:
-            print("[!!] Read error: ", e)
-            next(e)
+        except Exception:
+            xhr = next(transport)
             continue
 
         buffer.write(data)
