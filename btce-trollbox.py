@@ -30,15 +30,24 @@ COLORS   = (COLOR_2, COLOR_3, COLOR_4, COLOR_5,
             COLOR_6, COLOR_7, COLOR_8, COLOR_9)
 
 CHANNEL  = "chat_ru"
-CHAT_URL = "wss://ws.pusherapp.com/app/4e0ebd7a8b66fa3554a4?protocol=6&client=js&version=2.0.0&flash=false"
+BTCE_CHAT_URL = "wss://ws.pusherapp.com/app/4e0ebd7a8b66fa3554a4?protocol=6&client=js&version=2.0.0&flash=false"
 CONNECTION_TIMEOUT = 120
 
 
-def get_chat_connection():
-    ws = websocket.WebSocket()
-    ws.connect(CHAT_URL)
-    ws.settimeout(CONNECTION_TIMEOUT)
-    return ws
+def btce_transport(url=BTCE_CHAT_URL):##{
+    while True:
+        try:
+            ws = websocket.WebSocket()
+            ws.connect(url)
+            ws.settimeout(CONNECTION_TIMEOUT)
+        except Exception, e:
+            print("[!!!] Esteblish connection error: ", e)
+            sleep(3)
+
+        chat_handshake(ws)
+        yield ws
+##}
+
 
 def chat_handshake(ws):
     hello_msg = """{"event":"pusher:subscribe","data":{"channel":"%s"}}"""% CHANNEL
