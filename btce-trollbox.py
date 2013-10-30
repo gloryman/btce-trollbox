@@ -154,9 +154,9 @@ def tradingviewx(transport):##{
         if channel != "chat_bitcoin": continue
 
         content = pkg.get("text").get("content")
-        meta = content.get("meta")
         login = content.get('username')
         msg = content.get("text", "").encode("utf-8", errors="replace")
+        meta = content.get("meta", {})
         url = meta.get("url", "").encode("utf-8", errors="replace")
         if url:
             msg = "{}\n{:<19}{}{}{}".format(msg, "", COLOR_10, url, COLOR_0)
