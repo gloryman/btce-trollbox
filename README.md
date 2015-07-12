@@ -1,3 +1,10 @@
+
+
+New Version available:
+
+	[btce-trollbox-rs](https://github.com/gloryman/btce-trollbox-rs)
+	
+
 btc-e.com TollBOX console viewer
 
 Now you should be able to see chat in your terminal window!
