@@ -1,8 +1,6 @@
 
 
-New Version available:
-
-	[btce-trollbox-rs](https://github.com/gloryman/btce-trollbox-rs)
+New Version available: [btce-trollbox-rs](https://github.com/gloryman/btce-trollbox-rs)
 	
 
 btc-e.com TollBOX console viewer
